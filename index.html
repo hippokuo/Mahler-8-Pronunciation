@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1a1a2e">
+<title>馬勒第八號交響曲 — 發音練習</title>
+<style>
+  :root {
+    --bg: #0f0f1a;
+    --surface: #1a1a2e;
+    --card: #16213e;
+    --accent: #e94560;
+    --accent2: #0f3460;
+    --gold: #c9a84c;
+    --text: #e8e8f0;
+    --text-dim: #9090b0;
+    --border: #2a2a4a;
+    --player-bg: #0a0a16;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; overflow: hidden; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+  }
+
+  /* Header */
+  header {
+    background: var(--surface);
+    padding: 12px 16px 8px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .header-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: 0.5px;
+  }
+  .header-sub {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+
+  /* Tab bar */
+  .tab-bar {
+    display: flex;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .tab-btn {
+    flex: 1;
+    padding: 10px 8px;
+    border: none;
+    background: transparent;
+    color: var(--text-dim);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+  }
+  .tab-btn.active {
+    color: var(--gold);
+    border-bottom-color: var(--gold);
+  }
+
+  /* Main content */
+  .main {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+  }
+
+  /* Segment list */
+  .segment-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .segment-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .segment-item.active {
+    border-color: var(--gold);
+    background: #1e1830;
+  }
+  .segment-item:active { opacity: 0.8; transform: scale(0.99); }
+  .seg-num {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--accent2);
+    color: var(--gold);
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .segment-item.active .seg-num {
+    background: var(--gold);
+    color: #000;
+  }
+  .seg-info { flex: 1; min-width: 0; }
+  .seg-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .seg-page {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+  .seg-play-icon {
+    color: var(--text-dim);
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .segment-item.active .seg-play-icon { color: var(--gold); }
+
+  /* Lyrics panel */
+  .lyrics-panel {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 14px;
+    -webkit-overflow-scrolling: touch;
+    display: none;
+  }
+  .lyrics-panel.visible { display: block; }
+
+  .lyrics-section {
+    margin-bottom: 20px;
+  }
+  .lyrics-section-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--gold);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--border);
+  }
+  .lyrics-line {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 10px;
+    padding: 8px 10px;
+    background: var(--card);
+    border-radius: 8px;
+    border-left: 3px solid var(--accent2);
+  }
+  .lyrics-original {
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text);
+    font-style: italic;
+  }
+  .lyrics-translation {
+    font-size: 12px;
+    line-height: 1.6;
+    color: #b0b0d0;
+  }
+  .lyrics-highlight {
+    border-left-color: var(--gold);
+    background: #1e1830;
+  }
+
+  /* Player bar */
+  .player-bar {
+    background: var(--player-bg);
+    border-top: 1px solid var(--border);
+    padding: 10px 16px 14px;
+    flex-shrink: 0;
+  }
+  .now-playing {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .now-playing span { color: var(--gold); font-weight: 600; }
+
+  /* Progress bar */
+  .progress-container {
+    position: relative;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin-bottom: 10px;
+    cursor: pointer;
+  }
+  .progress-bar {
+    height: 100%;
+    background: var(--gold);
+    border-radius: 2px;
+    width: 0%;
+    transition: width 0.1s linear;
+    pointer-events: none;
+  }
+  .progress-container input[type=range] {
+    position: absolute;
+    top: -8px;
+    left: 0;
+    width: 100%;
+    height: 20px;
+    opacity: 0;
+    cursor: pointer;
+    margin: 0;
+  }
+
+  /* Time display */
+  .time-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-bottom: 10px;
+  }
+
+  /* Controls */
+  .controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .ctrl-btn {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    cursor: pointer;
+    font-size: 22px;
+    padding: 4px;
+    transition: color 0.15s;
+    flex-shrink: 0;
+  }
+  .ctrl-btn:active { opacity: 0.6; }
+  .ctrl-btn.active { color: var(--gold); }
+  .play-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--gold);
+    border: none;
+    color: #000;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.15s;
+    flex-shrink: 0;
+  }
+  .play-btn:active { opacity: 0.8; }
+
+  /* Speed control */
+  .speed-group {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+  }
+  .speed-label {
+    font-size: 10px;
+    color: var(--text-dim);
+    flex-shrink: 0;
+  }
+  .speed-slider {
+    flex: 1;
+    -webkit-appearance: none;
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    outline: none;
+  }
+  .speed-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--gold);
+    cursor: pointer;
+  }
+  .speed-val {
+    font-size: 11px;
+    color: var(--gold);
+    font-weight: 700;
+    width: 32px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* Bottom row */
+  .bottom-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .repeat-btn, .autonext-btn {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-dim);
+    font-size: 11px;
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .repeat-btn.active, .autonext-btn.active {
+    background: var(--accent2);
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+
+  /* Section divider in list */
+  .list-section-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 6px 4px 4px;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  /* No file notice */
+  .no-file-note {
+    background: #1a1020;
+    border: 1px solid #4a2040;
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin: 8px;
+    font-size: 11px;
+    color: #b080a0;
+    line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-title">🎼 馬勒《第八號交響曲》</div>
+  <div class="header-sub">發音練習播放器 — Choir 1 / Tenor 1</div>
+</header>
+
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('list')">▶ 全部</button>
+  <button class="tab-btn" onclick="switchTab('latin')">🇮🇹 拉丁文</button>
+  <button class="tab-btn" onclick="switchTab('german')">🇩🇪 德文</button>
+  <button class="tab-btn" onclick="switchTab('lyrics')">📖 歌詞</button>
+</div>
+
+<div class="main">
+  <!-- Segment list tab -->
+  <div class="segment-list" id="tab-list">
+    <div class="no-file-note">
+      ⚠️ 請將此 HTML 檔案放在與音檔相同的電腦上，並用瀏覽器開啟。音檔路徑需與下方設定相符。若在手機使用，請先透過 AirDrop 或雲端同步音檔。
+    </div>
+
+    <div class="list-section-label" id="label-latin">第一部分 — 德式拉丁文</div>
+
+    <div class="segment-item" data-part="1" onclick="loadSegment(0)">
+      <div class="seg-num" id="num-0">1</div>
+      <div class="seg-info">
+        <div class="seg-title">第一段：Veni, creator spiritus</div>
+        <div class="seg-page">樂譜 P.3 | 求造物主聖靈降臨</div>
+      </div>
+      <div class="seg-play-icon" id="icon-0">▶</div>
+    </div>
+
+    <div class="segment-item" data-part="1" onclick="loadSegment(1)">
+      <div class="seg-num" id="num-1">2</div>
+      <div class="seg-info">
+        <div class="seg-title">第二段：Qui Paraclitus diceris</div>
+        <div class="seg-page">樂譜 P.13 | 爾是安慰吾人之神</div>
+      </div>
+      <div class="seg-play-icon" id="icon-1">▶</div>
+    </div>
+
+    <div class="segment-item" data-part="1" onclick="loadSegment(2)">
+      <div class="seg-num" id="num-2">3</div>
+      <div class="seg-info">
+        <div class="seg-title">第三段：Infirma nostri corporis</div>
+        <div class="seg-page">樂譜 P.24 | 望主天主以爾永力</div>
+      </div>
+      <div class="seg-play-icon" id="icon-2">▶</div>
+    </div>
+
+    <div class="segment-item" data-part="1" onclick="loadSegment(3)">
+      <div class="seg-num" id="num-3">4</div>
+      <div class="seg-info">
+        <div class="seg-title">第四段：Hostem repellas longius</div>
+        <div class="seg-page">樂譜 P.43 | 驅逐仇敵使之遠遁</div>
+      </div>
+      <div class="seg-play-icon" id="icon-3">▶</div>
+    </div>
+
+    <div class="segment-item" data-part="1" onclick="loadSegment(4)">
+      <div class="seg-num" id="num-4">5</div>
+      <div class="seg-info">
+        <div class="seg-title">第五段：Tu septiformis munere</div>
+        <div class="seg-page">樂譜 P.51 | 爾為七神恩之源泉</div>
+      </div>
+      <div class="seg-play-icon" id="icon-4">▶</div>
+    </div>
+
+    <div class="segment-item" data-part="1" onclick="loadSegment(5)">
+      <div class="seg-num" id="num-5">6</div>
+      <div class="seg-info">
+        <div class="seg-title">第六段：Per te sciamus da Patrem</div>
+        <div class="seg-page">樂譜 P.57 | 賜我眾因爾識聖父</div>
+      </div>
+      <div class="seg-play-icon" id="icon-5">▶</div>
+    </div>
+
+    <div class="segment-item" data-part="1" onclick="loadSegment(6)">
+      <div class="seg-num" id="num-6">7</div>
+      <div class="seg-info">
+        <div class="seg-title">第七段：Da gaudiorum praemia</div>
+        <div class="seg-page">樂譜 P.79 | 賜爾世人無限歡樂</div>
+      </div>
+      <div class="seg-play-icon" id="icon-6">▶</div>
+    </div>
+
+    <div class="segment-item" data-part="1" onclick="loadSegment(7)">
+      <div class="seg-num" id="num-7">8</div>
+      <div class="seg-info">
+        <div class="seg-title">第八段：Gloria Patri Domino</div>
+        <div class="seg-page">樂譜 P.90 | 願吾天主至聖聖父</div>
+      </div>
+      <div class="seg-play-icon" id="icon-7">▶</div>
+    </div>
+
+    <div class="list-section-label" id="label-german" style="margin-top:8px">第二部分 — 德文（浮士德）</div>
+
+    <div class="segment-item" data-part="2" onclick="loadSegment(8)">
+      <div class="seg-num" id="num-8">9</div>
+      <div class="seg-info">
+        <div class="seg-title">神聖隱士合唱：Waldung, sie schwankt</div>
+        <div class="seg-page">樂譜 P.110 | 森林搖曳，山巖聳立</div>
+      </div>
+      <div class="seg-play-icon" id="icon-8">▶</div>
+    </div>
+
+    <div class="segment-item" data-part="2" onclick="loadSegment(9)">
+      <div class="seg-num" id="num-9">10</div>
+      <div class="seg-info">
+        <div class="seg-title">天使合唱：Gerettet ist das edle Glied</div>
+        <div class="seg-page">樂譜 P.125 | 精神世界的高貴者</div>
+      </div>
+      <div class="seg-play-icon" id="icon-9">▶</div>
+    </div>
+
+    <div class="segment-item" data-part="2" onclick="loadSegment(10)">
+      <div class="seg-num" id="num-10">11</div>
+      <div class="seg-info">
+        <div class="seg-title">得救兒童合唱：Hände verschlinget</div>
+        <div class="seg-page">樂譜 P.126 | 手拉手，圍成圈（兒童）</div>
+      </div>
+      <div class="seg-play-icon" id="icon-10">▶</div>
+    </div>
+
+    <div class="segment-item" data-part="2" onclick="loadSegment(11)">
+      <div class="seg-num" id="num-11">12</div>
+      <div class="seg-info">
+        <div class="seg-title">年輕天使合唱：Jene Rosen</div>
+        <div class="seg-page">樂譜 P.128 | 她們用手中的玫瑰</div>
+      </div>
+      <div class="seg-play-icon" id="icon-11">▶</div>
+    </div>
+
+    <div class="segment-item" data-part="2" onclick="loadSegment(12)">
+      <div class="seg-num" id="num-12">13</div>
+      <div class="seg-info">
+        <div class="seg-title">年長天使合唱：Uns bleibt ein Erdenrest</div>
+        <div class="seg-page">樂譜 P.135 | 我們艱難地搬運</div>
+      </div>
+      <div class="seg-play-icon" id="icon-12">▶</div>
+    </div>
+
+    <div class="segment-item" data-part="2" onclick="loadSegment(13)">
+      <div class="seg-num" id="num-13">14</div>
+      <div class="seg-info">
+        <div class="seg-title">年輕天使：Ich spür soeben</div>
+        <div class="seg-page">樂譜 P.138 | 此時此刻我感知</div>
+      </div>
+      <div class="seg-play-icon" id="icon-13">▶</div>
+    </div>
+
+    <div class="segment-item" data-part="2" onclick="loadSegment(14)">
+      <div class="seg-num" id="num-14">15</div>
+      <div class="seg-info">
+        <div class="seg-title">得救兒童：Freudig empfangen wir</div>
+        <div class="seg-page">樂譜 P.141 | 我們很高興迎接（兒童）</div>
+      </div>
+      <div class="seg-play-icon" id="icon-14">▶</div>
+    </div>
+
+    <div class="segment-item" data-part="2" onclick="loadSegment(15)">
+      <div class="seg-num" id="num-15">16</div>
+      <div class="seg-info">
+        <div class="seg-title">合唱：Dir, der Unberührbaren</div>
+        <div class="seg-page">樂譜 P.150 | 完美無瑕的處女</div>
+      </div>
+      <div class="seg-play-icon" id="icon-15">▶</div>
+    </div>
+
+    <div class="segment-item" data-part="2" onclick="loadSegment(16)">
+      <div class="seg-num" id="num-16">17</div>
+      <div class="seg-info">
+        <div class="seg-title">贖罪女人合唱：Du schwebst zu Höhen</div>
+        <div class="seg-page">樂譜 P.155 | 你向高處飛升</div>
+      </div>
+      <div class="seg-play-icon" id="icon-16">▶</div>
+    </div>
+
+    <div class="segment-item" data-part="2" onclick="loadSegment(17)">
+      <div class="seg-num" id="num-17">18</div>
+      <div class="seg-info">
+        <div class="seg-title">崇敬瑪莉亞 + 合唱：Neige, neige</div>
+        <div class="seg-page">樂譜 P.173 | 往下看，你，無與倫比</div>
+      </div>
+      <div class="seg-play-icon" id="icon-17">▶</div>
+    </div>
+
+    <div class="segment-item" data-part="2" onclick="loadSegment(18)">
+      <div class="seg-num" id="num-18">19</div>
+      <div class="seg-info">
+        <div class="seg-title">終曲：Alles Vergängliche / Chorus Mysticus</div>
+        <div class="seg-page">樂譜 P.179 至結束 | 一切過眼煙雲</div>
+      </div>
+      <div class="seg-play-icon" id="icon-18">▶</div>
+    </div>
+  </div>
+
+  <!-- Lyrics tab -->
+  <div class="lyrics-panel" id="tab-lyrics">
+    <div id="lyrics-content">
+      <div style="text-align:center;color:var(--text-dim);padding:40px 20px;font-size:13px">
+        請先在播放列表中選擇一段，<br>歌詞將顯示於此
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Player bar -->
+<div class="player-bar">
+  <div class="now-playing" id="now-playing">尚未選擇段落</div>
+
+  <div class="progress-container" id="progress-container">
+    <div class="progress-bar" id="progress-bar"></div>
+    <input type="range" id="seek-slider" min="0" max="100" value="0" step="0.1">
+  </div>
+  <div class="time-row">
+    <span id="time-current">0:00</span>
+    <span id="time-total">0:00</span>
+  </div>
+
+  <div class="controls">
+    <button class="ctrl-btn" onclick="prevSegment()" title="上一段">⏮</button>
+    <div class="speed-group">
+      <span class="speed-label">速度</span>
+      <input type="range" class="speed-slider" id="speed-slider" min="0.25" max="2" step="0.05" value="1" oninput="changeSpeed(this.value)">
+      <span class="speed-val" id="speed-val">1.0×</span>
+    </div>
+    <button class="play-btn" id="play-btn" onclick="togglePlay()">▶</button>
+    <button class="ctrl-btn" onclick="nextSegment()" title="下一段">⏭</button>
+  </div>
+
+  <div class="bottom-row">
+    <button class="repeat-btn" id="repeat-btn" onclick="toggleRepeat()">🔁 重複</button>
+    <button class="autonext-btn active" id="autonext-btn" onclick="toggleAutoNext()">⏩ 自動下一段</button>
+  </div>
+</div>
+
+<audio id="audio-player"></audio>
+
+<script>
+// ============================================================
+// 音檔路徑設定
+// 請根據實際檔案名稱調整（支援相對路徑）
+// 若此 HTML 放在「馬八交響曲」資料夾根目錄，路徑如下：
+// ============================================================
+const BASE_LATIN = "audio/latin/";
+const BASE_DE    = "audio/german/";
+
+const segments = [
+  // Part I - Latin
+  { id: 0, part: 1, page: "P.3",   title: "第一段：Veni, creator spiritus",           file: BASE_LATIN + "p03.m4a",    lyricsKey: "p3"  },
+  { id: 1, part: 1, page: "P.13",  title: "第二段：Qui Paraclitus diceris",           file: BASE_LATIN + "p13.m4a",   lyricsKey: "p13" },
+  { id: 2, part: 1, page: "P.24",  title: "第三段：Infirma nostri corporis",          file: BASE_LATIN + "p24.m4a",   lyricsKey: "p24" },
+  { id: 3, part: 1, page: "P.43",  title: "第四段：Hostem repellas longius",          file: BASE_LATIN + "p43.m4a",   lyricsKey: "p43" },
+  { id: 4, part: 1, page: "P.51",  title: "第五段：Tu septiformis munere",            file: BASE_LATIN + "p51.m4a",   lyricsKey: "p51" },
+  { id: 5, part: 1, page: "P.57",  title: "第六段：Per te sciamus da Patrem",         file: BASE_LATIN + "p57.m4a",   lyricsKey: "p57" },
+  { id: 6, part: 1, page: "P.79",  title: "第七段：Da gaudiorum praemia",             file: BASE_LATIN + "p79.m4a",   lyricsKey: "p79" },
+  { id: 7, part: 1, page: "P.90",  title: "第八段：Gloria Patri Domino",              file: BASE_LATIN + "p90.m4a",   lyricsKey: "p90" },
+  // Part II - German
+  { id: 8,  part: 2, page: "P.110", title: "神聖隱士合唱：Waldung, sie schwankt",      file: BASE_DE + "p110.m4a",               lyricsKey: "p110" },
+  { id: 9,  part: 2, page: "P.125", title: "天使合唱：Gerettet ist das edle Glied",   file: BASE_DE + "p125.m4a",               lyricsKey: "p125" },
+  { id: 10, part: 2, page: "P.126", title: "得救兒童合唱：Hände verschlinget",         file: BASE_DE + "p126.m4a",       lyricsKey: "p126" },
+  { id: 11, part: 2, page: "P.128", title: "年輕天使合唱：Jene Rosen",                 file: BASE_DE + "p128.m4a",               lyricsKey: "p128" },
+  { id: 12, part: 2, page: "P.135", title: "年長天使合唱：Uns bleibt ein Erdenrest",   file: BASE_DE + "p135.m4a",               lyricsKey: "p135" },
+  { id: 13, part: 2, page: "P.138", title: "年輕天使：Ich spür soeben",                file: BASE_DE + "p138.m4a",               lyricsKey: "p138" },
+  { id: 14, part: 2, page: "P.141", title: "得救兒童：Freudig empfangen wir",          file: BASE_DE + "p141.m4a",        lyricsKey: "p141" },
+  { id: 15, part: 2, page: "P.150", title: "合唱：Dir, der Unberührbaren",             file: BASE_DE + "p150.m4a",               lyricsKey: "p150" },
+  { id: 16, part: 2, page: "P.155", title: "贖罪女人合唱：Du schwebst zu Höhen",       file: BASE_DE + "p155.mp3",              lyricsKey: "p155" },
+  { id: 17, part: 2, page: "P.173", title: "崇敬瑪莉亞 + 合唱：Neige, neige",          file: BASE_DE + "p173.m4a",               lyricsKey: "p173" },
+  { id: 18, part: 2, page: "P.179", title: "終曲：Alles Vergängliche / Chorus Mysticus", file: BASE_DE + "p179.m4a",       lyricsKey: "p179" },
+];
+
+// ============================================================
+// 歌詞資料庫
+// ============================================================
+const lyricsDB = {
+  p3: {
+    title: "第一段 (P.3) — Veni, creator spiritus",
+    lines: [
+      { orig: "Veni, creator spiritus,", trans: "懇求造物聖神降臨，" },
+      { orig: "mentes tuorum visita;", trans: "眷顧爾信者之靈魂；" },
+      { orig: "imple superna gratia,", trans: "以爾天上聖寵神恩，" },
+      { orig: "quae tu creasti pectora.", trans: "充滿爾所造者之心。" },
+    ]
+  },
+  p13: {
+    title: "第二段 (P.13) — Qui Paraclitus diceris",
+    lines: [
+      { orig: "Qui Paraclitus diceris,", trans: "爾是安慰吾人之神，" },
+      { orig: "donum Dei altissimi,", trans: "至高至上天主恩惠，" },
+      { orig: "fons vivus, ignis, caritas,", trans: "活泉神火愛人熱誠，" },
+      { orig: "et spiritalis unctio.", trans: "並為善靈甘飴神味。" },
+    ]
+  },
+  p24: {
+    title: "第三段 (P.24) — Infirma nostri corporis",
+    lines: [
+      { orig: "Infirma nostri corporis", trans: "望主天主以爾永力，" },
+      { orig: "virtute firmans perpeti;", trans: "我身之弱藉以鞏固；" },
+      { orig: "accende lumen sensibus,", trans: "求爾點光明於諸司，" },
+      { orig: "infunde amorem cordibus.", trans: "傾賦愛情於我眾心。" },
+    ]
+  },
+  p43: {
+    title: "第四段 (P.43) — Hostem repellas longius",
+    lines: [
+      { orig: "Hostem repellas longius,", trans: "驅逐仇敵使之遠遁，" },
+      { orig: "Pacemque dones protinus;", trans: "平安之速賜吾人；" },
+      { orig: "ductore sic te praevio", trans: "凡害吾者悉皆避免，" },
+      { orig: "vitemus omne pessimum.", trans: "賴爾率領得以前進。" },
+    ]
+  },
+  p51: {
+    title: "第五段 (P.51) — Tu septiformis munere",
+    lines: [
+      { orig: "Tu septiformis munere,", trans: "爾為七神恩之源泉，" },
+      { orig: "dexterae paternae digitus;", trans: "又為全能聖父右臂；" },
+      { orig: "[tu rite promissum Patris,", trans: "[爾堪稱聖父之所許，" },
+      { orig: "sermone ditans guttura.]", trans: "賜爾信眾言詞富麗]。" },
+    ]
+  },
+  p57: {
+    title: "第六段 (P.57) — Per te sciamus da Patrem",
+    lines: [
+      { orig: "Per te sciamus da Patrem,", trans: "賜我眾因爾識聖父，" },
+      { orig: "noscamus [atque] Filium,", trans: "並其惟一所生聖子，" },
+      { orig: "[te utriusque] spiritum", trans: "爾是父子共發之神，" },
+      { orig: "credamus omni tempore.", trans: "我虔信爾於諸日時。" },
+    ]
+  },
+  p79: {
+    title: "第七段 (P.79) — Da gaudiorum praemia",
+    lines: [
+      { orig: "Da gaudiorum praemia,", trans: "賜爾世人無限歡樂，" },
+      { orig: "da gratiarum munera;", trans: "授爾聖父無盡恩典；" },
+      { orig: "dissolve litis vincula,", trans: "溶解束縛爾等枷鎖，" },
+      { orig: "adstringe pacis foedera.", trans: "永恆和平極樂世界。" },
+    ]
+  },
+  p90: {
+    title: "第八段 (P.90) — Gloria Patri Domino",
+    lines: [
+      { orig: "Gloria Patri Domino,", trans: "願吾天主至聖聖父，" },
+      { orig: "Deo sit gloria et Filio", trans: "並其子由死復生者，" },
+      { orig: "natoque, qui a mortuis", trans: "偕同安慰天主聖神，" },
+      { orig: "surrexit, ac Paraclito", trans: "獲得光榮及世之世。" },
+      { orig: "in saeculorum saecula", trans: "直到永世之世。" },
+    ]
+  },
+  p110: {
+    title: "P.110 — 神聖隱士合唱（HEILIGE ANACHORETEN）",
+    lines: [
+      { orig: "Waldung, sie schwankt heran,", trans: "森林搖曳，" },
+      { orig: "Felsen, sie lasten dran,", trans: "山巖聳立，" },
+      { orig: "Wurzeln, sie klammern an,", trans: "大樹盤根錯節，" },
+      { orig: "Stamm dicht an Stamm hinan.", trans: "枝幹毗連茂密。" },
+      { orig: "Woge nach Woge spritzt,", trans: "海浪重重疊疊，潑沫碎裂，" },
+      { orig: "Höhle, die tiefste, schützt.", trans: "巖洞曲曲幽幽，鳥獸隱匿，" },
+      { orig: "Löwen, sie schleichen stumm,", trans: "群獅安靜友好，" },
+      { orig: "Freundlich um uns herum,", trans: "圍繞我們踟躇，" },
+      { orig: "Ehren geweihten Ort,", trans: "神聖的愛之淨土，" },
+      { orig: "Heiligen Liebeshort.", trans: "越發顯得肅穆。" },
+    ]
+  },
+  p125: {
+    title: "P.125 — 天使合唱（CHOR DER ENGEL）",
+    lines: [
+      { orig: "Gerettet ist das edle Glied", trans: "精神世界的高貴者，" },
+      { orig: "Der Geisterwelt vom Bösen:", trans: "脫離了邪惡，得到了拯救；" },
+      { orig: "Wer immer strebend sich bemüht,", trans: "不斷努力的奮發者，" },
+      { orig: "Den können wir erlösen;", trans: "我們才有權給予他拯救；" },
+      { orig: "Und hat an ihm die Liebe gar", trans: "如果上帝的關愛，" },
+      { orig: "Von oben teilgenommen,", trans: "也施加於他，" },
+      { orig: "Begegnet ihm die sel'ge Schar", trans: "福祉的天使們，" },
+      { orig: "Mit herzlichem Willkommen.", trans: "將衷心迎候他。" },
+    ]
+  },
+  p126: {
+    title: "P.126 — 得救兒童合唱（CHOR SELIGER KNABEN）",
+    lines: [
+      { orig: "Hände verschlinget euch", trans: "手拉手" },
+      { orig: "Freudig zum Ringverein,", trans: "圍成圈，歡聚一堂" },
+      { orig: "Regt euch und singet", trans: "起舞吧，歌唱吧" },
+      { orig: "Heil'ge Gefühle drein!", trans: "讓聖潔的情感流轉其間！" },
+      { orig: "Göttlich belehret,", trans: "蒙神啟示，" },
+      { orig: "Dürft ihr vertrauen;", trans: "心中篤定；" },
+      { orig: "Den ihr verehret,", trans: "你們所敬仰的，" },
+      { orig: "Werdet ihr schauen.", trans: "終將得見其光。" },
+    ]
+  },
+  p128: {
+    title: "P.128 — 年輕天使合唱（DIE JÜNGEREN ENGEL）",
+    lines: [
+      { orig: "Jene Rosen, aus den Händen", trans: "她們用手中的玫瑰，" },
+      { orig: "Liebend-heiliger Büßerinnen,", trans: "懺悔的婦人，慈愛而聖潔，" },
+      { orig: "Halfen uns den Sieg gewinnen", trans: "幫助我們取得全勝，" },
+      { orig: "Und das hohe Werk vollenden,", trans: "完成了神聖的使命，" },
+      { orig: "Diesen Seelenschatz erbeuten.", trans: "俘獲了這一寶貴的靈魂。" },
+      { orig: "Böse wichen, als wir streuten,", trans: "我們撒下花朵，惡魔躲藏；" },
+      { orig: "Teufel flohen, als wir trafen.", trans: "當花朵投中時，惡魔逃遁。" },
+      { orig: "Jauchzet auf! es ist gelungen.", trans: "歡呼吧！使命已經完成！" },
+    ]
+  },
+  p135: {
+    title: "P.135 — 年長天使合唱（DIE VOLLENDETEREN ENGEL）",
+    lines: [
+      { orig: "Uns bleibt ein Erdenrest,", trans: "我們艱難地搬運" },
+      { orig: "Zu tragen peinlich,", trans: "塵世遺留的骨灰，" },
+      { orig: "Und wär' er von Asbest.", trans: "即使它成於石棉" },
+      { orig: "Er ist nicht reinlich.", trans: "也絕不清潔。" },
+      { orig: "Wenn starke Geisteskraft", trans: "偉大的精神之力，" },
+      { orig: "Die Elemente", trans: "將各種元素" },
+      { orig: "An sich herangerafft,", trans: "匯聚在一起。" },
+      { orig: "Kein Engel trennte", trans: "堅實的二位一體" },
+      { orig: "Geeinte Zwienatur", trans: "天使不能分離它們" },
+      { orig: "Die ewige Liebe nur", trans: "惟有永恆的愛" },
+      { orig: "Vermag's zu scheiden.", trans: "才能完成這一使命。" },
+    ]
+  },
+  p138: {
+    title: "P.138 — 年輕天使（DIE JÜNGEREN ENGEL）",
+    lines: [
+      { orig: "Ich spür soeben,", trans: "此時此刻我感知，" },
+      { orig: "Nebelnd um Felsenhöh',", trans: "裊裊的霧繚繞山巖，" },
+      { orig: "Ein Geisterleben.", trans: "栩栩的精靈，" },
+      { orig: "Regend sich in der Näh'.", trans: "在附近浮動著。" },
+      { orig: "Seliger Knaben", trans: "我看見一群" },
+      { orig: "Seh' ich bewegte Schar,", trans: "升上天的少年們，" },
+      { orig: "Los von der Erde Druck,", trans: "擺脫了塵世的重擔，" },
+      { orig: "Im Kreis gesellt,", trans: "輕快相聚，圍成一圈，" },
+      { orig: "Die sich erlaben", trans: "自在嬉遊" },
+      { orig: "Am neuen Lenz und Schmuck", trans: "沉浸在嶄新的春光" },
+      { orig: "Der obern Welt.", trans: "和上界的燦爛景徵。" },
+    ]
+  },
+  p141: {
+    title: "P.141 — 得救兒童（DIE SELIGEN KNABEN）",
+    lines: [
+      { orig: "Freudig empfangen wir", trans: "我們很高興迎接" },
+      { orig: "Diesen im Puppenstand;", trans: "這位以嬰孩之姿到來的祂；" },
+      { orig: "Also erlangen wir", trans: "就這樣，我們得到了" },
+      { orig: "Englisches Unterpfand.", trans: "天使般的福祉。" },
+      { orig: "Löset die Flocken los,", trans: "快把那些包裹他的繭殼解開，" },
+      { orig: "Die ihn umgeben!", trans: "把圍住他的束縛都拿掉！" },
+      { orig: "Schon ist er schön und groß", trans: "他已經開始展現美麗與力量" },
+      { orig: "Von heiligem Leben.", trans: "在神聖的生命中茁壯。" },
+    ]
+  },
+  p150: {
+    title: "P.150 — 合唱（Dir, der Unberührbaren）",
+    lines: [
+      { orig: "Dir, der Unberührbaren,", trans: "完美無瑕的處女，" },
+      { orig: "ist es nicht benommen,", trans: "你不拒絕，" },
+      { orig: "Daß die leicht Verführbaren", trans: "那些易受誘惑的人" },
+      { orig: "Traulich zu dir kommen.", trans: "懷著信心向你走近。" },
+      { orig: "In die Schwachheit hingerafft,", trans: "他們意志薄弱，" },
+      { orig: "Sind sie schwer zu retten.", trans: "難以挽救地步入歧途。" },
+      { orig: "Wer zerreißt aus eig'ner Kraft", trans: "有誰憑一己之力" },
+      { orig: "Der Gelüste Ketten?", trans: "掙脫了慾望的桎梏？" },
+      { orig: "Wie entgleitet schnell der Fuß", trans: "踏上了傾斜光滑的土地" },
+      { orig: "Schiefem, glattem Boden!", trans: "滑下去多麼迅速！" },
+    ]
+  },
+  p155: {
+    title: "P.155 — 贖罪女人合唱（CHOR DER BÜSSERINNEN）",
+    lines: [
+      { orig: "Du schwebst zu Höhen", trans: "你向高處飛升" },
+      { orig: "Der ewigen Reiche,", trans: "去那永恆的王國" },
+      { orig: "Vernimm das Flehen,", trans: "請接受我們的祈禱吧" },
+      { orig: "Du Gnadenreiche!", trans: "你，心懷憐憫！" },
+      { orig: "Du Ohnegleiche!", trans: "你，無與倫比！" },
+    ]
+  },
+  p173: {
+    title: "P.173 — Neige, neige（崇敬瑪莉亞學者 + 合唱）",
+    lines: [
+      { orig: "Neige, neige,", trans: "往下看，往下看，" },
+      { orig: "Du Ohnegleiche,", trans: "你，無與倫比，" },
+      { orig: "Du Strahlenreiche,", trans: "你，光輝燦爛，" },
+      { orig: "Dein Antlitz gnädig meinem Glück!", trans: "請以慈顏俯照我的福祉！" },
+    ]
+  },
+  p179: {
+    title: "P.179 終曲 — Alles Vergängliche / Chorus Mysticus",
+    lines: [
+      { orig: "Alles Vergängliche", trans: "一切過眼煙雲" },
+      { orig: "Ist nur ein Gleichnis;", trans: "不過是象徵；" },
+      { orig: "Das Unzulängliche,", trans: "一切不完美，" },
+      { orig: "Hier wird's Ereignis;", trans: "在此成真；" },
+      { orig: "Das Unbeschreibliche,", trans: "一切難以言說，" },
+      { orig: "Hier ist's getan;", trans: "在此得成；" },
+      { orig: "Das Ewig-Weibliche", trans: "永恆的女性" },
+      { orig: "Zieht uns hinan.", trans: "引領我們向上。" },
+    ]
+  },
+};
+
+// ============================================================
+// App State
+// ============================================================
+let currentIndex = -1;
+let isPlaying = false;
+let isRepeat = false;
+let isAutoNext = true;
+let currentSpeed = 1.0;
+let currentTab = 'list';
+
+const audio = document.getElementById('audio-player');
+const playBtn = document.getElementById('play-btn');
+const progressBar = document.getElementById('progress-bar');
+const seekSlider = document.getElementById('seek-slider');
+const timeCurrent = document.getElementById('time-current');
+const timeTotal = document.getElementById('time-total');
+const nowPlaying = document.getElementById('now-playing');
+
+// ============================================================
+// Tab switching
+// ============================================================
+function switchTab(tab) {
+  currentTab = tab;
+
+  // Update tab button active states
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const tabMap = ['list', 'latin', 'german', 'lyrics'];
+  tabBtns.forEach((btn, i) => {
+    btn.classList.toggle('active', tabMap[i] === tab);
+  });
+
+  // Show/hide list vs lyrics panel
+  const isListTab = (tab === 'list' || tab === 'latin' || tab === 'german');
+  document.getElementById('tab-list').style.display = isListTab ? 'block' : 'none';
+  document.getElementById('tab-lyrics').style.display = tab === 'lyrics' ? 'block' : 'none';
+
+  // Filter segment items by part
+  const items = document.querySelectorAll('.segment-item');
+  const labelLatin = document.getElementById('label-latin');
+  const labelGerman = document.getElementById('label-german');
+
+  items.forEach(item => {
+    const part = item.getAttribute('data-part');
+    if (tab === 'list') {
+      item.style.display = 'flex';
+    } else if (tab === 'latin') {
+      item.style.display = part === '1' ? 'flex' : 'none';
+    } else if (tab === 'german') {
+      item.style.display = part === '2' ? 'flex' : 'none';
+    }
+  });
+
+  // Show/hide section labels
+  if (tab === 'latin') {
+    labelLatin.style.display = 'block';
+    labelGerman.style.display = 'none';
+  } else if (tab === 'german') {
+    labelLatin.style.display = 'none';
+    labelGerman.style.display = 'block';
+  } else {
+    labelLatin.style.display = 'block';
+    labelGerman.style.display = 'block';
+  }
+}
+
+// ============================================================
+// Load segment
+// ============================================================
+function loadSegment(index) {
+  // Clear previous active
+  if (currentIndex >= 0) {
+    const prev = document.querySelector(`.segment-item:nth-child(n)`);
+    document.getElementById('num-' + currentIndex).parentElement.parentElement.classList.remove('active');
+    document.getElementById('icon-' + currentIndex).textContent = '▶';
+  }
+
+  currentIndex = index;
+  const seg = segments[index];
+
+  // Mark active
+  document.querySelectorAll('.segment-item').forEach(el => el.classList.remove('active'));
+  // Find the clicked item by seg num
+  const numEl = document.getElementById('num-' + index);
+  if (numEl) numEl.closest('.segment-item').classList.add('active');
+  document.getElementById('icon-' + index).textContent = '▶';
+
+  nowPlaying.innerHTML = `<span>${seg.page}</span> ${seg.title}`;
+
+  audio.src = seg.file;
+  audio.playbackRate = currentSpeed;
+  audio.load();
+  audio.play().then(() => {
+    isPlaying = true;
+    playBtn.textContent = '⏸';
+    document.getElementById('icon-' + index).textContent = '🔊';
+  }).catch(e => {
+    console.warn('播放失敗:', e);
+    playBtn.textContent = '▶';
+    isPlaying = false;
+    nowPlaying.innerHTML = `<span style="color:#e94560">⚠ 找不到音檔</span> ${seg.file}`;
+  });
+
+  // Update lyrics
+  updateLyrics(seg.lyricsKey);
+}
+
+function updateLyrics(key) {
+  const container = document.getElementById('lyrics-content');
+  const data = lyricsDB[key];
+  if (!data) {
+    container.innerHTML = '<div style="text-align:center;color:var(--text-dim);padding:40px 20px;font-size:13px">此段歌詞尚未載入</div>';
+    return;
+  }
+  let html = `<div class="lyrics-section"><div class="lyrics-section-title">${data.title}</div>`;
+  data.lines.forEach(line => {
+    html += `<div class="lyrics-line">
+      <div class="lyrics-original">${line.orig}</div>
+      <div class="lyrics-translation">${line.trans}</div>
+    </div>`;
+  });
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+// ============================================================
+// Playback controls
+// ============================================================
+function togglePlay() {
+  if (currentIndex < 0) { loadSegment(0); return; }
+  if (isPlaying) {
+    audio.pause();
+    isPlaying = false;
+    playBtn.textContent = '▶';
+    document.getElementById('icon-' + currentIndex).textContent = '▶';
+  } else {
+    audio.play();
+    isPlaying = true;
+    playBtn.textContent = '⏸';
+    document.getElementById('icon-' + currentIndex).textContent = '🔊';
+  }
+}
+
+function prevSegment() {
+  const next = Math.max(0, currentIndex - 1);
+  loadSegment(next);
+}
+
+function nextSegment() {
+  const next = Math.min(segments.length - 1, currentIndex + 1);
+  loadSegment(next);
+}
+
+function toggleRepeat() {
+  isRepeat = !isRepeat;
+  const btn = document.getElementById('repeat-btn');
+  btn.classList.toggle('active', isRepeat);
+}
+
+function toggleAutoNext() {
+  isAutoNext = !isAutoNext;
+  const btn = document.getElementById('autonext-btn');
+  btn.classList.toggle('active', isAutoNext);
+}
+
+function changeSpeed(val) {
+  currentSpeed = parseFloat(val);
+  document.getElementById('speed-val').textContent = currentSpeed.toFixed(2).replace(/\.?0+$/, '') + '×';
+  audio.playbackRate = currentSpeed;
+}
+
+// ============================================================
+// Audio events
+// ============================================================
+audio.addEventListener('timeupdate', () => {
+  if (!audio.duration) return;
+  const pct = (audio.currentTime / audio.duration) * 100;
+  progressBar.style.width = pct + '%';
+  seekSlider.value = pct;
+  timeCurrent.textContent = formatTime(audio.currentTime);
+});
+
+audio.addEventListener('loadedmetadata', () => {
+  timeTotal.textContent = formatTime(audio.duration);
+  audio.playbackRate = currentSpeed;
+});
+
+audio.addEventListener('ended', () => {
+  if (isRepeat) {
+    audio.currentTime = 0;
+    audio.play();
+  } else if (isAutoNext && currentIndex < segments.length - 1) {
+    loadSegment(currentIndex + 1);
+  } else {
+    isPlaying = false;
+    playBtn.textContent = '▶';
+    if (currentIndex >= 0) document.getElementById('icon-' + currentIndex).textContent = '▶';
+  }
+});
+
+seekSlider.addEventListener('input', () => {
+  if (audio.duration) {
+    audio.currentTime = (seekSlider.value / 100) * audio.duration;
+  }
+});
+
+function formatTime(s) {
+  if (isNaN(s)) return '0:00';
+  const m = Math.floor(s / 60);
+  const sec = Math.floor(s % 60).toString().padStart(2, '0');
+  return `${m}:${sec}`;
+}
+
+// Init tab display
+document.getElementById('tab-list').style.display = 'block';
+document.getElementById('tab-lyrics').style.display = 'none';
+</script>
+</body>
+</html>
